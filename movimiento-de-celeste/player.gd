@@ -4,7 +4,7 @@ var speed = 500
 var acceleration = 2200
 var friction = 1000
 
-var gravity = 900
+var gravity = 1500
 
 var jump_force = -800
 var max_jumps = 2
@@ -16,6 +16,11 @@ var dash_timer = 0
 var can_dash = true
 var dash_direction = Vector2.ZERO
 
+
+var wall_slide_speed = 150
+var wall_jump_force = -800
+var wall_jump_push = 500
+
 func _physics_process(delta):
 
 	var direction = Input.get_axis("left", "right")
@@ -26,7 +31,6 @@ func _physics_process(delta):
 		velocity = dash_direction * dash_speed
 
 	else:
-
 		if not is_on_floor():
 			if velocity.y > 0:
 				velocity.y += gravity * 1.5 * delta
@@ -36,6 +40,12 @@ func _physics_process(delta):
 			jumps_left = max_jumps
 			can_dash = true
 
+
+		if not is_on_floor() and is_on_wall() and direction != 0:
+			if velocity.y > wall_slide_speed:
+				velocity.y = wall_slide_speed
+
+
 		if direction != 0:
 			if is_on_floor():
 				velocity.x = move_toward(velocity.x, direction * speed, acceleration * delta)
@@ -44,12 +54,22 @@ func _physics_process(delta):
 		else:
 			velocity.x = move_toward(velocity.x, 0, friction * delta)
 
+
 	if Input.is_action_just_pressed("jump") and jumps_left > 0:
 		velocity.y = jump_force
 		jumps_left -= 1
 
+
+	if Input.is_action_just_pressed("jump") and is_on_wall() and not is_on_floor():
+		velocity.y = wall_jump_force
+		
+		if direction != 0:
+			velocity.x = -direction * wall_jump_push
+
+
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= 0.5
+
 
 	if Input.is_action_just_pressed("dash") and can_dash:
 		can_dash = false
