@@ -1,10 +1,10 @@
 extends CharacterBody2D
 
 var speed = 500
-var acceleration = 2200
-var friction = 1000
+var acceleration = 1500
+var friction = 2500
 
-var gravity = 1500
+var gravity = 2000
 
 var jump_force = -800
 var max_jumps = 2
